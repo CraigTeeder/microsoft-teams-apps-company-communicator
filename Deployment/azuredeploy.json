@@ -384,6 +384,133 @@
           "name": "[variables('serviceBusDataQueueName')]",
           "dependsOn": [
             "[concat('Microsoft.ServiceBus/namespaces/', variables('serviceBusNamespaceName'))]"
+        "name": "[if(variables('isSharedPlan'), concat(variables('skuFamily'), '1'), concat(variables('skuFamily'), parameters('hostingPlanSize')))]",
+        "tier": "[parameters('hostingPlanSku')]",
+        "size": "[concat(variables('skuFamily'), parameters('hostingPlanSize'))]",
+        "family": "[variables('skuFamily')]",
+        "capacity": 0
+      }
+    },
+    {
+      "apiVersion": "2016-08-01",
+      "type": "Microsoft.Web/sites",
+      "name": "[variables('botAppName')]",
+      "location": "[parameters('location')]",
+      "kind": "app",
+      "properties": {
+        "name": "[variables('botAppName')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+        "enabled": true,
+        "reserved": false,
+        "clientAffinityEnabled": true,
+        "clientCertEnabled": false,
+        "hostNamesDisabled": false,
+        "containerSize": 0,
+        "dailyMemoryTimeQuota": 0,
+        "httpsOnly": true,
+        "siteConfig": {
+          "alwaysOn": "[not(variables('isSharedPlan'))]",
+          "appSettings": [
+            {
+              "name": "PROJECT",
+              "value": "Source/CompanyCommunicator/Microsoft.Teams.Apps.CompanyCommunicator.csproj"
+            },
+            {
+              "name": "SITE_ROLE",
+              "value": "app"
+            },
+            {
+              "name": "i18n:DefaultCulture",
+              "value": "[variables('i18n:DefaultCulture')]"
+            },
+            {
+              "name": "i18n:SupportedCultures",
+              "value": "[variables('i18n:SupportedCultures')]"
+            },
+            {
+              "name": "ProactivelyInstallUserApp",
+              "value": "[variables('ProactivelyInstallUserApp')]"
+            },
+            {
+              "name": "UserAppExternalId",
+              "value": "[variables('UserAppExternalId')]"
+            },
+            {
+              "name": "AzureAd:TenantId",
+              "value": "[parameters('tenantId')]"
+            },
+            {
+              "name": "AzureAd:ClientId",
+              "value": "[parameters('authorClientId')]"
+            },
+            {
+              "name": "AzureAd:ClientSecret",
+              "value": "[parameters('authorClientSecret')]"
+            },
+            {
+              "name": "AzureAd:ApplicationIdURI",
+              "value": "[if(variables('useFrontDoor'), concat('api://', variables('frontDoorDomain')), '')]"
+            },
+            {
+              "name": "UserAppId",
+              "value": "[parameters('userClientId')]"
+            },
+            {
+              "name": "UserAppPassword",
+              "value": "[parameters('userClientSecret')]"
+            },
+            {
+              "name": "AuthorAppId",
+              "value": "[parameters('authorClientId')]"
+            },
+            {
+              "name": "AuthorAppPassword",
+              "value": "[parameters('authorClientSecret')]"
+            },
+            {
+              "name": "ImageUploadBlobStorage",
+              "value": "[parameters('ImageUploadBlobStorage')]"
+            },
+            {
+              "name": "ImageUploadBlobStorageSasDurationHours",
+              "value": "[parameters('ImageUploadBlobStorageSasDurationHours')]"
+            },
+            {
+              "name": "StorageAccountConnectionString",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')),'2015-05-01-preview').key1)]"
+            },
+            {
+              "name": "ServiceBusConnection",
+              "value": "[listkeys(variables('authRuleResourceId'), '2017-04-01').primaryConnectionString]"
+            },
+            {
+              "name": "AllowedTenants",
+              "value": "[parameters('tenantId')]"
+            },
+            {
+              "name": "DisableTenantFilter",
+              "value": "false"
+            },
+            {
+              "name": "AuthorizedCreatorUpns",
+              "value": "[parameters('senderUPNList')]"
+            },
+            {
+              "name": "DisableAuthentication",
+              "value": "false"
+            },
+            {
+              "name": "DisableCreatorUpnCheck",
+              "value": "false"
+            },
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('Microsoft.Insights/components/', variables('appInsightsName')), '2015-05-01').InstrumentationKey]"
+            },
+            {
+              "name": "WEBSITE_NODE_DEFAULT_VERSION",
+              "value": "16.13.0"
+            }
           ],
           "properties": {
             "lockDuration": "PT5M",

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AdaptiveCards;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -33,6 +34,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func.Models
         public List<Body> body { get; set; }
         public List<Action> actions { get; set; }
     }
+
     public class MsTeams
     {
         public bool allowExpand { get; set; }
